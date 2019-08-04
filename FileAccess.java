@@ -1,48 +1,70 @@
+package javafit2;
+
+//This file gives access to the underlying datafile and stores the data in the Workout class.
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.Scanner;
 
-// Write code to load the workouts from the provided workouts.csv file. The function should return a Workouts object.
-
 public class FileAccess {
-  
-  public static Workouts loadWorkouts() {
-    // What is a try/catch block and why do we need one?
-	  //in case there is an error that is predictable,
-	  //we can insert a series of steps that the program takes in order to handle the error
-    // What is an exception?
-	  //an exception is a situation the program recognizes as an error and will act accordingly depending on
-	  //what the situation is
-	  Workouts w1 = new Workouts();
-	  try (Scanner scanner = new Scanner(new File(Config.WORKOUTFILE))){
-		  while(scanner.hasNextLine()) { 
-			  ArrayList<String> row = getRecordFromLine(scanner.nextLine());
-			  w1.addWorkout(row.get(0), Workouts.Equipment.valueOf(row.get(1)), Workouts.Muscle.valueOf(row.get(2)), 
-					  Workouts.Muscle.valueOf(row.get(3)), row.get(4), row.get(5));
-		  }
-	  } 
-	  catch (java.lang.IllegalArgumentException e) {
-		  System.out.println("The input you gave is not found in the enum lists.");
-		  e.printStackTrace();
-	} catch (FileNotFoundException e1) {
-		  System.out.println("The file "+Config.WORKOUTFILE+" does not exist.");
-		// TODO Auto-generated catch block
-		  e1.printStackTrace();
-	}
-  
-	  
-	  return w1;
-  }
 
-private static ArrayList<String> getRecordFromLine(String nextLine) {
-	ArrayList<String> values = new ArrayList<String>();
-	try (Scanner newScanner = new Scanner(nextLine)) {
-		newScanner.useDelimiter(",");
-		while(newScanner.hasNext()) {
-			values.add(newScanner.next());
-		}
-	}
-	return values;
-	}
+public static Workouts loadWorkouts() {
+ Workouts retval = new Workouts();
+ 
+ try { 
+   Scanner scanner = new Scanner(new File(Config.WORKOUTFILE));
+   while (scanner.hasNextLine()) {
+     String line = scanner.nextLine();
+     String[] fields = line.split(",");
+     // Check to make sure glen didn't bork the data file.
+     if (fields.length != 6)
+       System.out.println("Line has "+fields.length+" fields instead of 6. Check your commas.");
+     String name = fields[0];
+     Config.Equipment equipment = Config.Equipment.valueOf(fields[1]);
+     Config.Muscle primaryMuscle = Config.Muscle.valueOf(fields[2]);
+     Config.Muscle secondaryMuscle = Config.Muscle.valueOf(fields[3]);
+     String desc = fields[4];
+     String reminders = fields[5];
+     retval.addWorkout(name, equipment, primaryMuscle, secondaryMuscle, desc, reminders);
+   }
+   scanner.close();
+ }
+ catch (FileNotFoundException e) 
+ {
+   System.out.println("Unable to find workouts file. Is it in the same directory as the executable?\nError:"+e.toString());
+ }
+ return retval;
+}
+//It should read a file defined in Config.WORKOUTFORMATFILE as a CSV file and return an enumeration hashmap.
+
+public static EnumMap<Config.MuscleGroup, ArrayList<Config.Muscle>> loadFormats() {
+	
+ EnumMap<Config.MuscleGroup, ArrayList<Config.Muscle>> retval  = 
+		 new EnumMap<Config.MuscleGroup, ArrayList<Config.Muscle>>(Config.MuscleGroup.class);
+ 
+	  try {
+		  Scanner scanner = new Scanner(new File(Config.WORKOUTFORMATFILE));
+		  while(scanner.hasNextLine()) {
+			  String line = scanner.nextLine();
+			  String[] fields = line.split(",");
+			  Config.MuscleGroup name = null;
+			  ArrayList<Config.Muscle> name1 = new ArrayList<Config.Muscle>();
+			  Config.Muscle name2 = null;
+			  for(int i=0; i<fields.length; ++i) {
+				  if(i==0) {name = Config.MuscleGroup.valueOf(fields[i]);} else {
+					  name2 = Config.Muscle.valueOf(fields[i]);
+					  name1.add(name2);
+				  }
+			  }
+			  retval.put(name,name1);
+			  
+		  }
+		  scanner.close();
+	  } catch (FileNotFoundException e) {
+		   System.out.println("Unable to find workouts file. Is it in the same directory as the executable?\nError: "+e.toString());
+		 }
+	  
+	  return retval;
+}
 }
