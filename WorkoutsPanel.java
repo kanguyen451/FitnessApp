@@ -1,4 +1,4 @@
-package javafit2;
+
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
