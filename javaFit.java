@@ -1,4 +1,3 @@
-package javafit2;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
