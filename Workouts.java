@@ -1,4 +1,4 @@
-package javafit2;
+
 
 import java.util.ArrayList; // We choose ArrayList over Vector because...?
 
