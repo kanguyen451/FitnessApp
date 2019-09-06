@@ -1,4 +1,1 @@
-# csce314summer2019
-https://github.com/misskim451/csce314summer2019/invitations
-Phase 1 for Kim Nguyen
-426007378
+Fitness app to tell you what method of workout you should do based on the desired primary and secondary muscles you wish to work out and what equipment you have.
